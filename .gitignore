@@ -1,0 +1,34 @@
+# Python y pruebas
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entornos locales
+.venv/
+.release-venv/
+venv/
+
+# Compilaciones y entregables
+build/
+dist/
+release/
+work/
+
+# Contenido generado o potencialmente sensible
+*.tutorial
+*.html
+*.htm
+*.tmp
+*.temp
+*.bak
+*.log
+
+# Herramientas y sistema operativo
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
