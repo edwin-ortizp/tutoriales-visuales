@@ -18,6 +18,8 @@ work/
 
 # Contenido generado o potencialmente sensible
 *.tutorial
+*.tutorial-draft.json
+*.report.json
 *.html
 *.htm
 *.tmp

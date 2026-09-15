@@ -1,0 +1,5 @@
+interface:
+  display_name: "Crear tutorial visual"
+  short_description: "Crea y edita .tutorial desde capturas locales"
+  brand_color: "#FF7A00"
+  default_prompt: "Usa $crear-tutorial-visual para convertir mis capturas locales en un tutorial editable, aclarando dudas y mostrando el borrador antes de generarlo."

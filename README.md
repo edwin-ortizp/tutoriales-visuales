@@ -29,6 +29,26 @@ Los proyectos `.tutorial`, HTML exportados, entornos virtuales, compilaciones e 
 
 La captura original se conserva dentro del `.tutorial`. Los ocultamientos, el recorte, el zoom y las anotaciones solo se aplican a la imagen procesada que se incrusta en el HTML.
 
+## Skill de Codex para borradores asistidos
+
+La skill versionada en `skills\crear-tutorial-visual` ayuda a convertir capturas ordenadas en un `.tutorial` editable y a revisar los textos de proyectos existentes. La IA muestra primero un borrador, aclara lo que no puede comprobar y solo ejecuta el generador después de una aprobación explícita.
+
+Instálala o actualízala en la carpeta personal de Codex desde PowerShell:
+
+```powershell
+.\scripts\install-codex-skill.ps1
+```
+
+Después puede invocarse como `$crear-tutorial-visual`. El generador determinista también está disponible directamente:
+
+```powershell
+python scripts\ai_tutorial.py create --images .\capturas --draft .\borrador.json --output .\mi-guia.tutorial
+python scripts\ai_tutorial.py inspect --project .\mi-guia.tutorial --output .\borrador.json
+python scripts\ai_tutorial.py update --project .\mi-guia.tutorial --draft .\borrador.json
+```
+
+Los comandos `create` y `update` rechazan borradores no aprobados, dudas pendientes, enlaces inseguros, imágenes dañadas o duplicadas y cambios de IDs. Los proyectos creados quedan pendientes de revisión visual.
+
 ## Instalación para usuarios finales
 
 - Requiere Windows 10 u 11 de 64 bits.
