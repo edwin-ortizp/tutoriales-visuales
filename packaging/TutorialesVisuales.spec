@@ -11,7 +11,7 @@ a = Analysis(
     [str(ROOT / "run.py")],
     pathex=[str(ROOT)],
     binaries=[],
-    datas=[(str(ICON), "assets")],
+    datas=[(str(ICON), "assets"), (str(ROOT / "packaging" / "update-helper.ps1"), "packaging")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -20,6 +20,9 @@ a = Analysis(
     noarchive=False,
     optimize=2,
 )
+# Qt en Windows 10+ usa ICU del sistema. PATH puede contener ICU de Poppler
+# con exportaciones incompatibles; nunca distribuir esa sustitución de icuuc.
+a.binaries = [entry for entry in a.binaries if entry[0].lower() != "icuuc.dll"]
 pyz = PYZ(a.pure)
 
 exe = EXE(

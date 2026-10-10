@@ -52,7 +52,7 @@ Los comandos `create` y `update` rechazan borradores no aprobados, dudas pendien
 ## Instalación para usuarios finales
 
 - Requiere Windows 10 u 11 de 64 bits.
-- Ejecuta `Tutoriales-Visuales-Setup-0.6.0.exe` y sigue el asistente en español.
+- Ejecuta `tutoriales-visuales-setup-2026.10.09.exe` y sigue el asistente en español.
 - No requiere Python, permisos de administrador ni conexión a Internet.
 - La instalación crea accesos directos en el menú Inicio y el escritorio y asocia los archivos `.tutorial`.
 - Al abrir un segundo proyecto, la aplicación activa la ventana existente en lugar de iniciar otra copia.
@@ -127,12 +127,28 @@ Si Inno Setup 6 no está instalado y `winget` está disponible:
 
 El proceso crea un entorno virtual limpio, instala dependencias fijadas, ejecuta las pruebas, genera el paquete `onedir`, valida el ejecutable con `--smoke-test`, compila el instalador y produce en `release\`:
 
-- `Tutoriales-Visuales-Setup-0.6.0.exe`
-- `Tutoriales-Visuales-Portable-0.6.0.zip`
-- `Tutoriales-Visuales-0.6.0.sha256`
+- `tutoriales-visuales-setup-2026.10.09.exe`
+- `tutoriales-visuales-portable-2026.10.09.zip`
+- `tutoriales-visuales-2026.10.09.sha256`
 - `release-manifest.json`
 
 La única fuente de versión es `tutorial_app.__version__`; al cambiarla, los nombres, metadatos del ejecutable, instalador y manifiesto se actualizan juntos.
+
+### Actualizaciones desde GitHub Releases
+
+Las versiones usan fechas: `2026.10.09`, con etiqueta pública `v.2026.10.09`. La primera publicación del día no lleva sufijo; las siguientes son `2026.10.09.2`, `.3`, etc. Un día nuevo comienza sin sufijo. Se rechazan fechas inválidas y el sufijo `.1`. El script de construcción consulta GitHub antes de construir: exige un repositorio público, rechaza versiones ya existentes y, para un consecutivo, exige que la release estable anterior del mismo día ya esté publicada. La consulta requiere conexión; si falla, la construcción se detiene. La publicación final debe volver a comprobar que la etiqueta sigue disponible, porque la comprobación previa no reserva la versión.
+
+Publica manualmente en `edwin-ortizp/tutoriales-visuales` una release estable con la etiqueta exacta `v.<versión>`. Adjunta juntos los cuatro archivos de `release/`: instalador `tutoriales-visuales-setup-<versión>.exe`, portable `tutoriales-visuales-portable-<versión>.zip`, `tutoriales-visuales-<versión>.sha256` y `release-manifest.json`. Prepara primero un borrador con todos los archivos y publícalo cuando estén completos; no reemplaces artefactos de una versión publicada. El script no publica ni crea etiquetas o commits.
+
+La aplicación instalada consulta la última release estable cinco segundos después de abrirse y cada seis horas mientras permanece abierta. Descarga el instalador en segundo plano, verifica tamaño y SHA-256 y ofrece **Actualizar y reiniciar** o **Más tarde**. Si pospones, el botón permanece en la barra inferior. También puedes usar **Ayuda → Buscar actualizaciones**. Las comprobaciones automáticas no muestran diálogos por errores de conexión; las manuales sí informan el fallo.
+
+Al actualizar se usa el diálogo normal de guardar/descartar/cancelar. Si cancelas o falla el guardado, no se instala. Un ayudante externo espera a que termine la aplicación, verifica otra vez el instalador, instala en la ubicación existente sin reiniciar Windows y abre de nuevo la aplicación con el proyecto guardado. Los proyectos y las copias de recuperación permanecen fuera de la carpeta de instalación. Si la instalación falla, se muestra el error y no se inicia automáticamente la aplicación.
+
+El instalador escribe `installation.json` para identificar la distribución instalada. El portable no incluye este marcador: busca versiones y ofrece abrir la descarga, sin reemplazar su carpeta. Ejecutando desde Python solo se permite la búsqueda manual y descarga desde GitHub. Los archivos temporales, `install.log` y `result.json` quedan en `%LOCALAPPDATA%/Tutoriales Visuales/updates`; el resultado se informa en el siguiente inicio.
+
+La primera versión que incluye este mecanismo requiere instalación manual. Los binarios siguen sin firma de código: SHA-256 verifica integridad frente al manifiesto publicado, no sustituye una firma del editor ni elimina los avisos de SmartScreen.
+
+Para repetir la prueba de instalación, primero construye la release y cierra la aplicación. Ejecuta `pwsh -File scripts/test-update-windows.ps1`: genera una versión consecutiva exclusivamente bajo `work/`, construye dos instaladores de prueba con las cargas reales, instala y actualiza en una carpeta aislada y verifica la reapertura de un proyecto intacto. Estos instaladores omiten asociaciones, accesos directos y registro de desinstalación; no se publican ni modifican la versión del código fuente. El script conserva logs y paquetes de prueba bajo `work/`.
 
 La construcción debe ejecutarse desde la raíz del repositorio. El script resuelve `assets`, `packaging`, `build`, `dist` y `release` de forma relativa a esa raíz; estos tres últimos directorios permanecen fuera de Git.
 

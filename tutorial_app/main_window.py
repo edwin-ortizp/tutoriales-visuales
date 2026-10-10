@@ -49,6 +49,7 @@ from .project_io import InvalidProjectError, load_project, save_project
 from .recovery import InvalidRecoveryError, RecoveryManager
 from .rich_text import RichTextEditor, SafeRichTextEdit
 from .widgets import PreviewCanvas, VisualEditorCanvas
+from . import __version__
 
 
 class VisualStateCommand(QUndoCommand):
@@ -991,12 +992,24 @@ class MainWindow(QMainWindow):
     def _update_window_title(self) -> None:
         name = self.project_path.name if self.project_path else (self.project.title or "Sin título")
         marker = " *" if self.dirty else ""
-        self.setWindowTitle(f"Tutoriales visuales 0.4 — {name}{marker}")
+        self.setWindowTitle(f"Tutoriales visuales v.{__version__} — {name}{marker}")
 
     def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802
         if not self._maybe_save_changes():
+            self._pending_update = None
             event.ignore()
             return
+        pending = getattr(self, "_pending_update", None)
+        if pending:
+            try:
+                from .updater import launch_update
+                launch_update(pending[0], pending[1], self.project_path)
+            except Exception as exc:
+                self._pending_update = None
+                QMessageBox.warning(self, "No se pudo actualizar", str(exc))
+                event.ignore()
+                return
+            self._pending_update = None
         self._clear_preview_file()
         self.hotkey.close()
         self.recovery.shutdown()

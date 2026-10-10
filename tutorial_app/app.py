@@ -126,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
         return 3
 
     window = MainWindow()
+    from .update_ui import UpdateController
+    window.update_controller = UpdateController(window)
     controller.commandReceived.connect(window.handle_external_command)
     window.show()
     project_path = str(Path(arguments.project).resolve()) if arguments.project else None

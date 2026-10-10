@@ -11,6 +11,8 @@
 AppId={#AppGuid}
 AppName={#AppName}
 AppVersion={#AppVersion}
+VersionInfoVersion={#GetFileVersion("..\dist\TutorialesVisuales\TutorialesVisuales.exe")}
+VersionInfoProductVersion={#GetFileVersion("..\dist\TutorialesVisuales\TutorialesVisuales.exe")}
 AppVerName={#AppName} {#AppVersion}
 AppPublisher=Tutoriales Visuales
 DefaultDirName={localappdata}\Programs\Tutoriales Visuales
@@ -21,7 +23,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\release
-OutputBaseFilename=Tutoriales-Visuales-Setup-{#AppVersion}
+OutputBaseFilename=tutoriales-visuales-setup-{#AppVersion}
 SetupIconFile=..\assets\tutoriales-visuales.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 Compression=lzma2/max
@@ -41,6 +43,7 @@ Name: "desktopicon"; Description: "Crear un acceso directo en el escritorio"; Gr
 
 [Files]
 Source: "..\dist\TutorialesVisuales\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installation.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"

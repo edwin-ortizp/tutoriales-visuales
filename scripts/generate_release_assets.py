@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from tutorial_app.versioning import version_key
 
 
 def read_version() -> str:
     source = (ROOT / "tutorial_app" / "__init__.py").read_text(encoding="utf-8")
-    match = re.search(r'^__version__\s*=\s*"(\d+\.\d+\.\d+)"', source, re.MULTILINE)
+    match = re.search(r'^__version__\s*=\s*"([^"]+)"', source, re.MULTILINE)
     if not match:
-        raise RuntimeError("No se encontró __version__ con formato semántico.")
+        raise RuntimeError("No se encontró __version__.")
+    version_key(match.group(1))
     return match.group(1)
 
 
@@ -46,7 +50,7 @@ def generate_icon() -> Path:
 
 
 def generate_version_info(version: str) -> Path:
-    version_tuple = tuple(int(part) for part in version.split(".")) + (0,)
+    version_tuple = version_key(version)
     packaging = ROOT / "packaging"
     packaging.mkdir(parents=True, exist_ok=True)
     target = packaging / "windows-version-info.txt"

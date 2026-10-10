@@ -80,9 +80,11 @@ if (-not $innoCompiler) {
 Push-Location $projectRoot
 try {
     $version = (& $pythonCommand.Source -c "from tutorial_app import __version__; print(__version__)").Trim()
-    if ($LASTEXITCODE -ne 0 -or $version -notmatch '^\d+\.\d+\.\d+$') {
-        throw 'tutorial_app.__version__ no contiene una versión semántica válida.'
+    if ($LASTEXITCODE -ne 0) {
+        throw 'No se pudo leer tutorial_app.__version__.'
     }
+    & $pythonCommand.Source scripts\check_release_version.py
+    if ($LASTEXITCODE -ne 0) { throw 'No se pudo verificar que la versión sea nueva y el repositorio público.' }
     Write-Host "Construyendo Tutoriales Visuales $version"
 
     Reset-ProjectDirectory $venvPath
@@ -117,14 +119,18 @@ try {
         throw 'El ejecutable esperado no fue generado.'
     }
     $smoke = Start-Process -FilePath $portableExe -ArgumentList '--smoke-test' `
-        -Wait -PassThru -WindowStyle Hidden
+        -PassThru -WindowStyle Hidden
+    if (-not $smoke.WaitForExit(60000)) {
+        Stop-Process -Id $smoke.Id
+        throw 'El smoke test no terminó en 60 segundos; revisa el ejecutable empaquetado.'
+    }
     if ($smoke.ExitCode -ne 0) {
         throw "El ejecutable empaquetado falló el smoke test (código $($smoke.ExitCode))."
     }
 
-    $portableZip = Join-Path $releasePath "Tutoriales-Visuales-Portable-$version.zip"
-    $installer = Join-Path $releasePath "Tutoriales-Visuales-Setup-$version.exe"
-    $checksumFile = Join-Path $releasePath "Tutoriales-Visuales-$version.sha256"
+    $portableZip = Join-Path $releasePath "tutoriales-visuales-portable-$version.zip"
+    $installer = Join-Path $releasePath "tutoriales-visuales-setup-$version.exe"
+    $checksumFile = Join-Path $releasePath "tutoriales-visuales-$version.sha256"
     $manifestFile = Join-Path $releasePath 'release-manifest.json'
     foreach ($artifact in @($portableZip, $installer, $checksumFile, $manifestFile)) {
         $safeArtifact = Assert-ProjectChild $artifact
@@ -174,7 +180,7 @@ try {
     $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestFile -Encoding utf8
 
     Write-Host ''
-    Write-Host 'Publicación terminada:'
+    Write-Host 'Construcción local terminada (sin publicar en GitHub):'
     Write-Host "  Instalador: $installer"
     Write-Host "  Portable:   $portableZip"
     Write-Host "  SHA-256:    $checksumFile"
